@@ -267,9 +267,10 @@ export default function DatabaseSelector({
 
   function changeCatalog(catalog: CatalogOption | null | undefined) {
     setCurrentCatalog(catalog);
-    setCurrentSchema(undefined);
     if (onCatalogChange && catalog?.value !== catalogRef.current) {
       onCatalogChange(catalog?.value);
+      console.log('Changed catalog, setting schema to undefined');
+      changeSchema(undefined);
     }
   }
 
@@ -306,6 +307,9 @@ export default function DatabaseSelector({
   const catalogOptions = catalogData?.catalogs || EMPTY_CATALOG_OPTIONS;
 
   useEffect(() => {
+    console.log('useEffect called');
+    console.log('catalog (current, default):', catalog, catalogData?.defaultCatalog);
+    console.log('schema (current, default):', schema, schemaData?.defaultSchema);
     setCurrentDb(current =>
       current?.id !== db?.id
         ? db
@@ -333,17 +337,9 @@ export default function DatabaseSelector({
     database: DatabaseValue,
   ) {
     setCurrentDb(database);
-    setCurrentCatalog(undefined);
-    setCurrentSchema(undefined);
-    if (onDbChange) {
-      onDbChange(database);
-    }
-    if (onCatalogChange) {
-      onCatalogChange(undefined);
-    }
-    if (onSchemaChange) {
-      onSchemaChange(undefined);
-    }
+    onDbChange?.(database);
+    onCatalogChange?.(undefined);
+    onSchemaChange?.(undefined);
   }
 
   function renderSelectRow(select: ReactNode, refreshBtn: ReactNode) {
